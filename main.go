@@ -10,10 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ibrahimker/latihan-register/config"
 	"github.com/ibrahimker/latihan-register/handler"
-	"github.com/ibrahimker/latihan-register/middleware"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"google.golang.org/api/idtoken"
 )
 
 const PORT = ":8080"
@@ -24,10 +22,10 @@ func main() {
 		log.Fatal(perr)
 	}
 
-	googleTokenValidator, perr := idtoken.NewValidator(context.Background())
-	if perr != nil {
-		log.Fatal(perr)
-	}
+	// // googleTokenValidator, perr := idtoken.NewValidator(context.Background())
+	// if perr != nil {
+	// 	log.Fatal(perr)
+	// }
 
 	var cfg config.Config
 	err := cleanenv.ReadConfig(".env", &cfg)
@@ -39,13 +37,21 @@ func main() {
 	userHandler := handler.NewUserHandler(postgrespool)
 	r.HandleFunc("/users", userHandler.UsersHandler)
 	r.HandleFunc("/users/{id}", userHandler.UsersHandler)
+	r.HandleFunc("/users/login", userHandler.LoginHandler)
 	orderHandler := handler.NewOrderHandler(postgrespool)
 	r.HandleFunc("/orders", orderHandler.OrderHandler)
 	r.HandleFunc("/orders/{id}", orderHandler.OrderHandler)
 
-	authMiddleware := middleware.NewAuthMiddleware(&cfg, googleTokenValidator)
+	// authMiddleware := middleware.NewAuthMiddleware(&cfg, googleTokenValidator)
 	// r.Use(authMiddleware.AuthBasicMiddleware)
-	r.Use(authMiddleware.AuthGoogleIDTokenMiddleware)
+	// r.Use(authMiddleware.AuthGoogleIDTokenMiddleware)
+
+	const htmlPath = "static/web.html"
+	const jsonPath = "static/weather.json"
+
+	go handler.GenerateToJson()
+
+	r.HandleFunc("/assignment3", handler.Assignment3Handler)
 
 	fmt.Println("Now listening on port 0.0.0.0" + PORT)
 	srv := &http.Server{

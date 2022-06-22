@@ -38,6 +38,7 @@ var users = map[int]entity.User{
 
 type UserHandlerInterface interface {
 	UsersHandler(w http.ResponseWriter, r *http.Request)
+	LoginHandler(w http.ResponseWriter, r *http.Request)
 }
 
 type UserHandler struct {
@@ -84,10 +85,7 @@ func (h *UserHandler) getUsersHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		users = append(users, &user)
 	}
-	// var usersSlice []entity.User
-	// for _, v := range users {
-	// 	usersSlice = append(usersSlice, v)
-	// }
+
 	jsonData, _ := json.Marshal(&users)
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(jsonData)
