@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ibrahimker/latihan-register/config"
 	"github.com/ibrahimker/latihan-register/handler"
+	"github.com/ibrahimker/latihan-register/service"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -22,11 +23,6 @@ func main() {
 		log.Fatal(perr)
 	}
 
-	// // googleTokenValidator, perr := idtoken.NewValidator(context.Background())
-	// if perr != nil {
-	// 	log.Fatal(perr)
-	// }
-
 	var cfg config.Config
 	err := cleanenv.ReadConfig(".env", &cfg)
 	if err != nil {
@@ -34,15 +30,23 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+
+	// init service
+	userService := service.NewUserSvc()
+
+	// init handler
 	userHandler := handler.NewUserHandler(postgrespool)
+
+	// setup route
 	r.HandleFunc("/users", userHandler.UsersHandler)
 	r.HandleFunc("/users/{id}", userHandler.UsersHandler)
 	r.HandleFunc("/users/login", userHandler.LoginHandler)
+	r.HandleFunc("/users/register", userHandler.LoginHandler)
 	orderHandler := handler.NewOrderHandler(postgrespool)
 	r.HandleFunc("/orders", orderHandler.OrderHandler)
 	r.HandleFunc("/orders/{id}", orderHandler.OrderHandler)
 
-	// authMiddleware := middleware.NewAuthMiddleware(&cfg, googleTokenValidator)
+	// authMiddleware := middleware.NewAuthMiddleware(&cfg)
 	// r.Use(authMiddleware.AuthBasicMiddleware)
 	// r.Use(authMiddleware.AuthGoogleIDTokenMiddleware)
 

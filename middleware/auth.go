@@ -15,12 +15,11 @@ type AuthMiddlewareIface interface {
 }
 
 type AuthMiddleware struct {
-	cfg                  *config.Config
-	googleTokenValidator *idtoken.Validator
+	cfg *config.Config
 }
 
-func NewAuthMiddleware(cfg *config.Config, googleTokenValidator *idtoken.Validator) AuthMiddlewareIface {
-	return &AuthMiddleware{cfg: cfg, googleTokenValidator: googleTokenValidator}
+func NewAuthMiddleware(cfg *config.Config) AuthMiddlewareIface {
+	return &AuthMiddleware{cfg: cfg}
 }
 
 func (m *AuthMiddleware) AuthBasicMiddleware(next http.Handler) http.Handler {
@@ -39,7 +38,7 @@ func (m *AuthMiddleware) AuthGoogleIDTokenMiddleware(next http.Handler) http.Han
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if authHeader := strings.Split(r.Header.Get("Authorization"), " "); len(authHeader) == 2 && authHeader[0] == "Bearer" {
 			idToken := authHeader[1]
-			idTokenPayload, err := m.googleTokenValidator.Validate(r.Context(), idToken, m.cfg.GoogleClientID)
+			idTokenPayload, err := idtoken.Validate(r.Context(), idToken, m.cfg.GoogleClientID)
 			if err != nil {
 				log.Println("Error when validate id token", err)
 				w.WriteHeader(http.StatusUnauthorized)

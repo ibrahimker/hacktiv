@@ -19,6 +19,9 @@ const jsonPath = "static/weather.json"
 
 func Assignment3Handler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content Type", "text/html")
+	// read from json file and write to webData
+	file, _ := ioutil.ReadFile(jsonPath)
+	json.Unmarshal(file, &webData)
 	templates, _ := template.ParseFiles(htmlPath)
 	context := entity.WebData{
 		Status: entity.Status{
@@ -45,13 +48,6 @@ func GenerateToJson() {
 		// write to json file
 		jsonString, _ := json.Marshal(&webData)
 		ioutil.WriteFile(jsonPath, jsonString, os.ModePerm)
-
-		// clean webdata
-		webData := entity.WebData{}
-
-		// read from json file and write to webData
-		file, _ := ioutil.ReadFile(jsonPath)
-		json.Unmarshal(file, &webData)
 
 		// sleep for 15 seconds
 		time.Sleep(15 * time.Second)
