@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ibrahimker/latihan-register/config"
 	"github.com/ibrahimker/latihan-register/handler"
+	"github.com/ibrahimker/latihan-register/repository"
 	"github.com/ibrahimker/latihan-register/service"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -31,20 +32,25 @@ func main() {
 
 	r := mux.NewRouter()
 
+	// init repository
+	userRepo := repository.NewUserRepo(postgrespool)
+
 	// init service
-	userService := service.NewUserSvc()
+	userService := service.NewUserSvc(userRepo)
 
 	// init handler
-	userHandler := handler.NewUserHandler(postgrespool)
+	loginHandler := handler.NewLoginHandler(userService)
+	registerHandler := handler.NewRegisterHandler(userService)
+	// userHandler := handler.NewUserHandler(postgrespool)
 
 	// setup route
-	r.HandleFunc("/users", userHandler.UsersHandler)
-	r.HandleFunc("/users/{id}", userHandler.UsersHandler)
-	r.HandleFunc("/users/login", userHandler.LoginHandler)
-	r.HandleFunc("/users/register", userHandler.LoginHandler)
-	orderHandler := handler.NewOrderHandler(postgrespool)
-	r.HandleFunc("/orders", orderHandler.OrderHandler)
-	r.HandleFunc("/orders/{id}", orderHandler.OrderHandler)
+	// r.HandleFunc("/users", userHandler.UsersHandler)
+	// r.HandleFunc("/users/{id}", userHandler.UsersHandler)
+	r.HandleFunc("/users/login", loginHandler.LoginHandler)
+	r.HandleFunc("/users/register", registerHandler.RegisterHandler)
+	// orderHandler := handler.NewOrderHandler(postgrespool)
+	// r.HandleFunc("/orders", orderHandler.OrderHandler)
+	// r.HandleFunc("/orders/{id}", orderHandler.OrderHandler)
 
 	// authMiddleware := middleware.NewAuthMiddleware(&cfg)
 	// r.Use(authMiddleware.AuthBasicMiddleware)

@@ -38,7 +38,6 @@ var users = map[int]entity.User{
 
 type UserHandlerInterface interface {
 	UsersHandler(w http.ResponseWriter, r *http.Request)
-	LoginHandler(w http.ResponseWriter, r *http.Request)
 }
 
 type UserHandler struct {

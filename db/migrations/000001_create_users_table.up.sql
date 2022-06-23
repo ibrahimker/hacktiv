@@ -1,4 +1,5 @@
 begin;
+
 create table if not exists public.users (
     id serial primary key,
     username varchar(100) not null,
