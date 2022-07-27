@@ -19,15 +19,15 @@ import (
 const PORT = ":8080"
 
 func main() {
-	postgrespool, perr := newPostgresPool("localhost", "5432", "postgresuser", "postgrespassword", "postgres")
-	if perr != nil {
-		log.Fatal(perr)
-	}
-
 	var cfg config.Config
 	err := cleanenv.ReadConfig(".env", &cfg)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	postgrespool, perr := newPostgresPool("localhost", "5432", cfg.Username, cfg.Password, "postgres")
+	if perr != nil {
+		log.Fatal(perr)
 	}
 
 	r := mux.NewRouter()
