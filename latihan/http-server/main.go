@@ -22,6 +22,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/register", userSvc.RegisterHandler)
 	r.HandleFunc("/user", userSvc.GetUserHandler)
+	r.HandleFunc("/user/{id}", userSvc.GetUserHandler)
 	srv := &http.Server{
 		Handler: r,
 		Addr:    "localhost:8080",

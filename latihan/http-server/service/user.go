@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type User struct {
@@ -53,8 +56,17 @@ func (u *userService) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *userService) GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	users := u.GetUser()
-	data, _ := json.Marshal(users)
+	id := mux.Vars(r)["id"]
 	w.Header().Add("content-type", "application/json")
-	w.Write(data)
+	if id != "" {
+		idInt, _ := strconv.Atoi(id)
+		users := u.GetUser()
+		user := users[idInt]
+		data, _ := json.Marshal(user)
+		w.Write(data)
+	} else {
+		users := u.GetUser()
+		data, _ := json.Marshal(users)
+		w.Write(data)
+	}
 }
